@@ -1,0 +1,33 @@
+index:
+    path: /
+    controller: App\Controller\HomeController::index
+
+token:
+    path: /token
+    controller: App\Controller\HomeController::token
+    methods: [POST]
+
+test:
+    path: /test
+    controller: App\Controller\HomeController::test
+    methods: [POST]
+
+user_add:
+    path: /add-user
+    controller: App\Controller\UserController::addUser
+    methods: [POST]
+
+login:
+    path: /login
+    controller: App\Controller\LoginController::login
+    methods: [GET, POST]
+
+logout:
+    path: /logout
+    controller: App\Controller\LoginController::logoutAction
+    methods: [POST]
+
+register:
+    path: /register
+    controller: App\Controller\RegisterController::registerAction
+    methods: [GET, POST]
