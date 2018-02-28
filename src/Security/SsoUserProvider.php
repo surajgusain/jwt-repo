@@ -11,6 +11,7 @@ namespace App\Security;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManager;
+use function dump;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -77,6 +78,9 @@ class SsoUserProvider implements UserProviderInterface
     public function loadUserByUsername($username)
     {
         $user = $this->entityManager->getRepository(UserRepository::class)->findOneBy(['username' => $username]);
+
+        dump($user);
+        die();
 
         if (!$user) {
             throw new UsernameNotFoundException();

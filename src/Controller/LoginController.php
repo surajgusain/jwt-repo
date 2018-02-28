@@ -9,9 +9,11 @@
 namespace App\Controller;
 
 
+use App\Form\LoginForm;
 use function dump;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class LoginController extends Controller
@@ -24,17 +26,30 @@ class LoginController extends Controller
      */
     public function login(Request $request, AuthenticationUtils $authenticationUtils)
     {
-
-        $errors = $authenticationUtils->getLastAuthenticationError();
+        // get the login error if there is one
+        $error = $authenticationUtils->getLastAuthenticationError();
+        // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
+        $form = $this->createForm(LoginForm::class, [
+            'username' => $lastUsername,
+        ]);
 
         return $this->render('login/login.html.twig', array(
-            'error' => $errors,
-            'username' => $lastUsername
+            'form' => $form->createView(),
+            'error' => $error,
         ));
     }
 
-    public function logoutAction()
+    public function loginRequest(Request $request)
+    {
+        dump($request->getContent());
+        die();
+    }
+
+    /**
+     * @Route("logout", name="logout")
+     */
+    public function logout()
     {
 
     }

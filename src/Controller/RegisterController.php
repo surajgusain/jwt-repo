@@ -33,7 +33,8 @@ class RegisterController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
 
             $em = $this->getDoctrine()->getManager();
-            $user->setPassword($encoder->encodePassword($user, $user->getPassword()));
+
+            $user->setPassword($encoder->encodePassword($user, $user->getPlainPassword()));
             $em->persist($user);
             $em->flush();
             return $this->redirectToRoute('login');

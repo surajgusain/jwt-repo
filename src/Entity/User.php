@@ -28,16 +28,23 @@ class User implements UserInterface
     private $name;
 
     /**
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\NotBlank(message = "Please enter your email")
+     * @Assert\Email(message = "Please enter a valid email.")
+     */
+    private $email;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
-     * @Assert\NotBlank(message = "Please enter your email")
-     * @Assert\Email(message = "Please enter a valid email.")
      */
-    private $email;
+    private $salt;
+
+    private $plainPassword;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
@@ -51,6 +58,11 @@ class User implements UserInterface
      * @ORM\Column(type="json_array")
      */
     private $roles = array();
+
+    public function __construct()
+    {
+        $this->salt = $this->generateSalt();
+    }
 
     /**
      * @return mixed
@@ -90,6 +102,9 @@ class User implements UserInterface
     public function setEmail($email): void
     {
         $this->email = $email;
+        if (empty($this->username)) {
+            $this->username = $email;
+        }
     }
 
     /**
@@ -112,9 +127,9 @@ class User implements UserInterface
     {
         $tmpRoles = $this->roles;
 
-        if(in_array('ROLE_USER', $tmpRoles) === false) {
-            $tmpRoles[] = 'ROLE_USER';
-        }
+//        if(in_array('ROLE_USER', $tmpRoles) === false) {
+//            $tmpRoles[] = 'ROLE_USER';
+//        }
 
         return $tmpRoles;
     }
@@ -143,7 +158,25 @@ class User implements UserInterface
     public function setPassword($password)
     {
         $this->password = $password;
-        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPlainPassword()
+    {
+        return $this->plainPassword;
+    }
+
+    /**
+     * @param mixed $plainPassword
+     */
+    public function setPlainPassword($plainPassword): void
+    {
+        $this->plainPassword = $plainPassword;
+        // forces the object to look "dirty" to Doctrine. Avoids
+        // Doctrine not saving this entity, if only plainPassword changes
+        $this->password = null;
     }
 
     /**
@@ -153,15 +186,7 @@ class User implements UserInterface
      */
     public function getUsername()
     {
-        return $this->email;
-    }
-
-    /**
-     * @param mixed $username
-     */
-    public function setUsername($username): void
-    {
-        $this->username = $username;
+        return $this->username;
     }
 
     /**
@@ -172,7 +197,7 @@ class User implements UserInterface
      */
     public function eraseCredentials(): void
     {
-        $this->password = null;
+        $this->plainPassword = null;
     }
 
     /**
@@ -193,6 +218,14 @@ class User implements UserInterface
      */
     public function getSalt()
     {
-        // TODO: Implement getSalt() method.
+        return $this->salt;
+    }
+
+    /**
+     * @param mixed $salt
+     */
+    public function setSalt($salt): void
+    {
+        $this->salt = $salt;
     }
 }

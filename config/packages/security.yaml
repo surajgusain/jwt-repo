@@ -8,26 +8,27 @@ security:
         sso_user_provider:
             entity:
                 class: App\Entity\User
+                property: username
 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: true
-            provider: sso_user_provider
-
-            form_login:
-                login_path: login
-                check_path: login
+            pattern: ^/
+            anonymous: ~
+#            provider: sso_user_provider
+#            form_login:
+#                login_path: '/login'
+#                check_path: '/login'
 
             logout:
                 path: /logout
                 target: /
 
-            guard:
-                authenticators:
-                    - App\Security\TokenAuthenticator
+#            guard:
+#                authenticators:
+#                    - App\Security\TokenAuthenticator
 
             # activate different ways to authenticate
 
@@ -36,11 +37,31 @@ security:
 
             # form_login: true
             # https://symfony.com/doc/current/security/form_login_setup.html
+        admin:
+            pattern: ^/admin
+            anonymous: ~
+            provider: sso_user_provider
+            guard:
+                authenticators:
+                    - App\Security\LoginFormAuthenticator
+            logout:
+                path: /logout
+
+
+#        sso:
+#            pattern: ^/sso
+#            anonymous: ~
+#            guard:
+#                authenticators:
+#                    - App\Security\TokenAuthenticator
+
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
-
+        - { path: ^/sso/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin, roles: ROLE_USER }
+#        - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/logout, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/sso, roles: IS_AUTHENTICATED_FULLY }

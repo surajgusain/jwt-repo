@@ -10,16 +10,14 @@ namespace App\Controller;
 
 
 use App\Exceptions\InvalidParameterException;
-use App\Repository\UsersRepository;
+use App\Repository\UserRepository;
 use App\Services\FirebaseJwtService;
 use Doctrine\ORM\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends Controller
 {
@@ -30,11 +28,11 @@ class HomeController extends Controller
     private $jwtService;
 
     /**
-     * @var UsersRepository
+     * @var UserRepository
      */
     private $userRepository;
 
-    public function __construct(FirebaseJwtService $jwtService, UsersRepository $userRepository)
+    public function __construct(FirebaseJwtService $jwtService, UserRepository $userRepository)
     {
         $this->jwtService = $jwtService;
         $this->userRepository = $userRepository;
@@ -58,9 +56,10 @@ class HomeController extends Controller
         $token = null;
         $data = json_decode($request->getContent(), true);
 
-        if($this->jwtService->validateRequest($request)) {
 
-            $token = $this->jwtService->generateToken($this->userRepository, $data['param']);
+        if ($this->jwtService->validateRequest($request)) {
+
+            $token = $this->jwtService->generateToken($this->userRepository, $data['params']);
 
             return new JsonResponse(['token' => $token], 200);
         }
@@ -78,7 +77,31 @@ class HomeController extends Controller
 
         $response = $this->jwtService->getAuthorizationToken($request);
         return new Response($response);
+    }
 
+    public function page(Request $request)
+    {
+        return $this->render('login/page.html.twig', array());
+    }
+
+    /**
+     * @Route("/sso", name="hello")
+     * @param Request $request
+     * @return Response
+     */
+    public function hello(Request $request)
+    {
+        return new Response('Hello, you are in sso page!');
+    }
+
+    /**
+     * @Route("/admin", name="admin_page")
+     * @param Request $request
+     * @return Response
+     */
+    public function adminIndex(Request $request)
+    {
+        return new Response('Hello! You are in admin page');
     }
 
 }

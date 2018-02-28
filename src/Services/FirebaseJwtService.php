@@ -11,14 +11,22 @@ namespace App\Services;
 
 use App\Exceptions\DataException;
 use App\Exceptions\InvalidParameterException;
+use App\Repository\UserRepository;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\ORMException;
+use function dump;
 use Firebase\JWT\JWT;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 class FirebaseJwtService
 {
+
+    /**
+     * @var UserPasswordEncoder
+     */
+    private $encoder;
 
     /**
      * @param Request $request
@@ -30,35 +38,35 @@ class FirebaseJwtService
         $type = $request->getContentType();
         $data = json_decode($request->getContent(), true);
 
-        if ($type != 'json') {
-            throw new InvalidTypeException("Type is invalid");
+        if ($type !== 'json') {
+            throw new InvalidTypeException('Type is invalid');
         }
 
         if (!isset($data['name']) || empty($data['name'])) {
-            throw new InvalidParameterException("API Name is needed");
+            throw new InvalidParameterException('API Name is needed');
         }
 
-        if (!empty($data['params'])) {
-            throw new InvalidParameterException("API Parameters are needed");
+        if (empty($data['params'])) {
+            throw new InvalidParameterException('API Parameters are needed');
         }
         return true;
     }
 
     /**
-     * @param UsersRepository $repository
+     * @param UserRepository $repository
      * @param                 $data
      * @return mixed
+     * @throws DataException
      * @throws InvalidParameterException
      * @throws ORMException
-     * @throws DataException
      */
-    public function generateToken(UsersRepository $repository, $data)
+    public function generateToken(UserRepository $repository, $data)
     {
 
         $email = $this->validateParameters('email', $data['email'], true);
         $password = $this->validateParameters('password', $data['password'], true);
 
-        $user = $repository->findOneBy(['email' => $email,'password' => $password]);
+        $user = $repository->findOneBy(['email' => $email, 'password' => $password]);
 
         if ($user === null) {
             throw new ORMException("Record not found in our database");

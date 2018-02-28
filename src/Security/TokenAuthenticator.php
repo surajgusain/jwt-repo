@@ -70,18 +70,19 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function supports(Request $request)
     {
-        $header = $request->headers->get('Authorization');
-        $data = explode(' ', $header);
-
-        if(2 === count($data)) {
-            $token = $data[1];
-
-            if(strtolower($data[0]) !== 'bearer' || empty($data[1])) {
-                throw new InvalidParameterException('Invalid authorization parameters');
-            }
-            $payload = JWT::decode($token, getenv('JWT_SECRET_KEY'), ['HS256']);
-            return true;
-        }
+//        $header = $request->headers->get('Authorization');
+//        $data = explode(' ', $header);
+//
+//        if(2 === count($data)) {
+//            $token = $data[1];
+//
+//            if(strtolower($data[0]) !== 'bearer' || empty($data[1])) {
+//                throw new InvalidParameterException('Invalid authorization parameters');
+//            }
+//            $payload = JWT::decode($token, getenv('JWT_SECRET_KEY'), ['HS256']);
+//            return true;
+//        }
+        // todo: throw exception
         return false;
     }
 
@@ -137,11 +138,8 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-
         $token = $credentials['token'];
-
-        $user = JWT::decode($token, getenv('JWT_SECRET_KEY'));
-
+        $user = JWT::decode($token, getenv('JWT_SECRET_KEY'), ['HS256']);
         return $userProvider->loadUserByUsername($user['params']['email']);
     }
 

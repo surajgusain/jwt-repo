@@ -18,16 +18,31 @@ user_add:
     methods: [POST]
 
 login:
-    path: /login
+    path: /admin/login
     controller: App\Controller\LoginController::login
     methods: [GET, POST]
 
 logout:
     path: /logout
-    controller: App\Controller\LoginController::logoutAction
-    methods: [POST]
+    controller: App\Controller\LoginController::logout
+    methods: [GET, POST]
 
 register:
     path: /register
     controller: App\Controller\RegisterController::registerAction
     methods: [GET, POST]
+
+test_page:
+    path: /test-page
+    controller: App\Controller\HomeController::page
+    methods: [GET]
+
+login_request:
+    path: /login-request
+    controller: App\Controller\LoginController::loginRequest
+    methods: [POST]
+
+find_users:
+    path: /find-users
+    controller: App\Controller\UserController::findById
+    methods: [POST]
